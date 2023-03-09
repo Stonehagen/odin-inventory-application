@@ -1,7 +1,26 @@
+const async = require('async');
+
 const Category = require('../models/category');
+const Item = require('../models/item');
 
 exports.index = (req, res) => {
-  res.send('NOT IMPLEMENTED: Site Home Page');
+  async.parallel(
+    {
+      categoryCount(callback) {
+        Category.countDocuments({}, callback);
+      },
+      itemCount(callback) {
+        Item.countDocuments({}, callback);
+      },
+    },
+    (err, results) => {
+      res.render('index', {
+        title: 'Inventory Home',
+        error: err,
+        data: results,
+      });
+    },
+  );
 };
 
 // Display list of all Categories
