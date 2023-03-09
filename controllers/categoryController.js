@@ -1,5 +1,9 @@
 const Category = require('../models/category');
 
+exports.index = (req, res) => {
+  res.send('NOT IMPLEMENTED: Site Home Page');
+};
+
 // Display list of all Categories
 exports.categoryList = (req, res) => {
   res.send('NOT IMPLEMENTED: Category List');
