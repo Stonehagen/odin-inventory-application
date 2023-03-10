@@ -1,26 +1,23 @@
-const async = require('async');
-
 const Category = require('../models/category');
 const Item = require('../models/item');
 
 exports.index = (req, res) => {
-  async.parallel(
-    {
-      categoryCount(callback) {
-        Category.countDocuments({}, callback);
-      },
-      itemCount(callback) {
-        Item.countDocuments({}, callback);
-      },
-    },
-    (err, results) => {
-      res.render('index', {
-        title: 'Inventory Home',
-        error: err,
-        data: results,
-      });
-    },
-  );
+  const renderIndex = (err, results) => {
+    res.render('index', {
+      title: 'Inventory Home',
+      error: err,
+      data: results,
+    });
+  };
+
+  Promise.all([Category.countDocuments({}), Item.countDocuments({})])
+    .then((results) => {
+      const counts = { categoryCount: results[0], itemCount: results[1] };
+      renderIndex(undefined, counts);
+    })
+    .catch((err) => {
+      renderIndex(err);
+    });
 };
 
 // Display list of all Categories
