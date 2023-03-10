@@ -1,3 +1,5 @@
+const { body, validationResult } = require('express-validator');
+
 const Category = require('../models/category');
 const Item = require('../models/item');
 
@@ -52,13 +54,48 @@ exports.categoryDetail = (req, res, next) => {
 
 // Display Category Create form on GET
 exports.categoryCreateGet = (req, res) => {
-  res.send('NOT IMPLEMENTED: Category create Get');
+  res.render('CategoryForm', { title: 'Create Category' });
 };
 
 // Handle Category create on Post
-exports.categoryCreatePost = (req, res) => {
-  res.send('NOT IMPLEMENTED: Category create Post');
-};
+exports.categoryCreatePost = [
+  body('name', 'Category name required').trim().isLength({ min: 3 }).escape(),
+  body('description', 'Description required')
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+
+    const category = new Category({
+      name: req.body.name,
+      description: req.body.description,
+    });
+
+    if (!errors.isEmpty()) {
+      res.render('categoryForm', {
+        title: 'Create Category',
+        category,
+        errors: errors.array(),
+      });
+      return;
+    }
+    Category.findOne({ name: req.body.name })
+      .exec()
+      .then((found) => {
+        if (found) {
+          res.redirect(found.url);
+        } else {
+          category.save()
+            .then(() => {
+              res.redirect(category.url);
+            })
+            .catch((err) => next(err));
+        }
+      })
+      .catch((err) => next(err));
+  },
+];
 
 // Display Category delete form on GET
 exports.categoryDeleteGet = (req, res) => {
