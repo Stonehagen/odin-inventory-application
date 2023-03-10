@@ -1,8 +1,17 @@
 const Item = require('../models/item');
 
 // Display list of all Items
-exports.itemList = (req, res) => {
-  res.send('NOT IMPLEMENTED: Items List');
+exports.itemList = (req, res, next) => {
+  Item.find({}, 'name price')
+    .sort({ name: 1 })
+    .exec()
+    .then((listItem) => {
+      res.render('itemList', {
+        title: 'Items',
+        itemList: listItem,
+      });
+    })
+    .catch((err) => next(err));
 };
 
 // Display detail Page for Specific Items
