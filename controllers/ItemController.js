@@ -1,4 +1,5 @@
 const Item = require('../models/item');
+const Category = require('../models/category');
 
 // Display list of all Items
 exports.itemList = (req, res, next) => {
@@ -15,8 +16,15 @@ exports.itemList = (req, res, next) => {
 };
 
 // Display detail Page for Specific Items
-exports.itemDetail = (req, res) => {
-  res.send(`NOT IMPLREMENTED: Items Detail: ${req.params.id}`);
+exports.itemDetail = (req, res, next) => {
+  Item.findById(req.params.id).exec()
+    .then((item) => {
+      res.render('itemDetail', {
+        title: 'Item Detail',
+        item,
+      });
+    })
+    .catch((err) => next(err));
 };
 
 // Display Items Create form on GET
