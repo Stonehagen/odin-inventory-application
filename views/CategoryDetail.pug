@@ -1,0 +1,18 @@
+extends layout
+
+block content
+
+  h1 Category: #{category.name}
+    p #{category.description}
+
+  div(style='margin-left:20px;margin-top:20px')
+
+    h4 Items
+    dl
+      each item in categoryItems
+        dt
+          a(href=item.url) #{item.name}
+        dd $#{item.price}
+
+      else
+        p This genre has no books

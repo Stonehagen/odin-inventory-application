@@ -35,8 +35,19 @@ exports.categoryList = (req, res, next) => {
 };
 
 // Display detail Page for Specific Category
-exports.categoryDetail = (req, res) => {
-  res.send(`NOT IMPLREMENTED: Category Detail: ${req.params.id}`);
+exports.categoryDetail = (req, res, next) => {
+  Promise.all([
+    Category.findById(req.params.id).exec(),
+    Item.find({ category: req.params.id }).exec(),
+  ])
+    .then((results) => {
+      res.render('categoryDetail', {
+        title: 'Category Detail',
+        category: results[0],
+        categoryItems: results[1],
+      });
+    })
+    .catch((err) => next(err));
 };
 
 // Display Category Create form on GET
