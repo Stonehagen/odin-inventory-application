@@ -21,8 +21,17 @@ exports.index = (req, res) => {
 };
 
 // Display list of all Categories
-exports.categoryList = (req, res) => {
-  res.send('NOT IMPLEMENTED: Category List');
+exports.categoryList = (req, res, next) => {
+  Category.find({}, 'name')
+    .sort({ name: 1 })
+    .exec()
+    .then((listCategory) => {
+      res.render('categoryList', {
+        title: 'Categories',
+        categoryList: listCategory,
+      });
+    })
+    .catch((err) => next(err));
 };
 
 // Display detail Page for Specific Category
