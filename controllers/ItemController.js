@@ -100,13 +100,27 @@ exports.itemCreatePost = [
 ];
 
 // Display Items delete form on GET
-exports.itemDeleteGet = (req, res) => {
-  res.send('NOT IMPLEMENTED: Items delete Get');
+exports.itemDeleteGet = (req, res, next) => {
+  Item.findById(req.params.id).exec()
+    .then((item) => {
+      if (item == null) {
+        res.redirect('/Inventar/Items');
+      }
+      res.render('ItemDelete', {
+        title: 'Delete Item',
+        item,
+      });
+    })
+    .catch((err) => next(err));
 };
 
 // Handle Items create on Post
-exports.itemDeletePost = (req, res) => {
-  res.send('NOT IMPLEMENTED: Items delete Post');
+exports.itemDeletePost = (req, res, next) => {
+  Item.findByIdAndRemove(req.body.itemId).exec()
+    .then(() => {
+      res.redirect('/Inventar/items');
+    })
+    .catch((err) => next(err));
 };
 
 // Display Items update form on GET

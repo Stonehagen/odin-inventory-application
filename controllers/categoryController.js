@@ -1,4 +1,3 @@
-const { reject } = require('async');
 const { body, validationResult } = require('express-validator');
 
 const Category = require('../models/category');

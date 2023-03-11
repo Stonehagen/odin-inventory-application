@@ -4,8 +4,9 @@ block content
 
   h1 Item: #{item.name}
   p #{item.description}
-  p Price; $#{item.price}
+  p Price: $#{item.price}
   p in Stock: #{item.stock}pcs
 
-
-  div(style='margin-left:20px;margin-top:20px')
+  hr
+  p
+    a(href=item.url+'/delete') Delete Item
