@@ -1,3 +1,4 @@
+const { reject } = require('async');
 const { body, validationResult } = require('express-validator');
 
 const Category = require('../models/category');
@@ -86,7 +87,8 @@ exports.categoryCreatePost = [
         if (found) {
           res.redirect(found.url);
         } else {
-          category.save()
+          category
+            .save()
             .then(() => {
               res.redirect(category.url);
             })
@@ -98,13 +100,45 @@ exports.categoryCreatePost = [
 ];
 
 // Display Category delete form on GET
-exports.categoryDeleteGet = (req, res) => {
-  res.send('NOT IMPLEMENTED: Category delete Get');
+exports.categoryDeleteGet = (req, res, next) => {
+  Promise.all([
+    Category.findById(req.params.id).exec(),
+    Item.find({ category: req.params.id }).exec(),
+  ])
+    .then(([category, items]) => {
+      if (category == null) {
+        res.redirect('/Inventar/categories');
+      }
+      res.render('CategoryDelete', {
+        title: 'Delete Category',
+        category,
+        items,
+      });
+    })
+    .catch((err) => next(err));
 };
 
 // Handle Category create on Post
-exports.categoryDeletePost = (req, res) => {
-  res.send('NOT IMPLEMENTED: Category delete Post');
+exports.categoryDeletePost = (req, res, next) => {
+  Promise.all([
+    Category.findById(req.body.categoryId).exec(),
+    Item.find({ category: req.body.categoryId }).exec(),
+  ])
+    .then(([category, items]) => {
+      if (items.length > 0) {
+        res.render('categoryDelete', {
+          title: 'Delete Category',
+          category,
+          items,
+        });
+        Promise.reject(new Error('Category is not empty!'));
+      }
+    })
+    .then(() => Category.findByIdAndRemove(req.body.categoryId).exec())
+    .then(() => {
+      res.redirect('/Inventar/categories');
+    })
+    .catch((err) => next(err));
 };
 
 // Display Category update form on GET
