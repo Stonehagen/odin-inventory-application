@@ -60,7 +60,7 @@ exports.categoryCreateGet = (req, res) => {
 // Handle Category create on Post
 exports.categoryCreatePost = [
   body('name', 'Category name required').trim().isLength({ min: 3 }).escape(),
-  body('description', 'Description required')
+  body('description', 'Category description required')
     .trim()
     .isLength({ min: 3 })
     .escape(),
@@ -73,7 +73,7 @@ exports.categoryCreatePost = [
     });
 
     if (!errors.isEmpty()) {
-      res.render('categoryForm', {
+      res.render('CategoryForm', {
         title: 'Create Category',
         category,
         errors: errors.array(),
