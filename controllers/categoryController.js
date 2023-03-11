@@ -141,11 +141,54 @@ exports.categoryDeletePost = (req, res, next) => {
 };
 
 // Display Category update form on GET
-exports.categoryUpdateGet = (req, res) => {
-  res.send('NOT IMPLEMENTED: Category update Get');
+exports.categoryUpdateGet = (req, res, next) => {
+  Category.findById(req.params.id)
+    .exec()
+    // eslint-disable-next-line consistent-return
+    .then((category) => {
+      if (category == null) {
+        const err = new Error('Category not found');
+        err.status = 404;
+        return next(err);
+      }
+
+      res.render('CategoryForm', {
+        title: 'Update Category',
+        category,
+      });
+    })
+    .catch((err) => next(err));
 };
 
 // Handle Category update on Post
-exports.categoryUpdatePost = (req, res) => {
-  res.send('NOT IMPLEMENTED: Category update Post');
-};
+exports.categoryUpdatePost = [
+  body('name', 'Category name required').trim().isLength({ min: 3 }).escape(),
+  body('description', 'Category description required')
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+
+    const category = new Category({
+      name: req.body.name,
+      description: req.body.description,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      res.render('CategoryForm', {
+        title: 'Update Category',
+        category,
+        errors: errors.array(),
+      });
+      return;
+    }
+    Category.findByIdAndUpdate(req.params.id, category, {})
+      .exec()
+      .then((theCategory) => {
+        res.redirect(theCategory.url);
+      })
+      .catch((err) => next(err));
+  },
+];
