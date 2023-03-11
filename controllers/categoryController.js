@@ -191,4 +191,5 @@ exports.categoryUpdatePost = [
       })
       .catch((err) => next(err));
   },
+  
 ];
